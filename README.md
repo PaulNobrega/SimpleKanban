@@ -1,5 +1,7 @@
 # SimpleKanban
 
+![UI Example](_readme_src/ui_example.png)
+
 A modern, portable Kanban board web app written in vanilla JS with local data persistence and easy extensibility for remote storage.
 
 ## Features

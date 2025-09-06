@@ -70,9 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Global tags object
     let tags = {
-        "UI/UX": "#3b82f6",
-        "Project Setup": "#ef4444",
-        "Backend": "#10b981"
+        // Example: "UI/UX": "#3b82f6",
     };
 
     // Tag delete confirmation modal logic (move inside DOMContentLoaded for correct tags reference)
@@ -139,7 +137,6 @@ document.addEventListener('DOMContentLoaded', () => {
         tagDeleteModal.classList.add('hidden');
         tagToDelete = null;
     }
-    // ...existing code...
 
     const tagModal = document.getElementById('tag-modal');
     const cancelTagBtn = document.getElementById('cancel-tag');
@@ -192,8 +189,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
-    // ...existing code...
-    // All other JS code from the HTML file
 
     // Function to open and populate the tag modal
     function openTagModal() {
