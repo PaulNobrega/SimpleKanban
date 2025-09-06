@@ -1,0 +1,159 @@
+body {
+    font-family: 'Inter', sans-serif;
+}
+body.dark {
+    background-color: #18181b;
+    color: #e5e7eb;
+}
+.kanban-column {
+    user-select: none;
+    background-color: #fff;
+}
+body.dark .kanban-column {
+    background-color: #23232a;
+    color: #e5e7eb;
+}
+.task {
+    background-color: #f9fafb;
+    color: #222;
+}
+body.dark .task {
+    background-color: #262632;
+    color: #e5e7eb;
+}
+.tasks::-webkit-scrollbar {
+    width: 8px;
+}
+.tasks::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+body.dark .tasks::-webkit-scrollbar-track {
+    background: #23232a;
+}
+.tasks::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 10px;
+}
+body.dark .tasks::-webkit-scrollbar-thumb {
+    background: #444459;
+}
+.tasks::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+body.dark .tasks::-webkit-scrollbar-thumb:hover {
+    background: #6366f1;
+}
+.tag-tooltip {
+    visibility: hidden;
+    width: 120px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+body.dark .tag-tooltip {
+    background-color: #222;
+    color: #e5e7eb;
+}
+.tag-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+body.dark .tag-tooltip::after {
+    border-color: #222 transparent transparent transparent;
+}
+.tag-circle:hover .tag-tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+.dot {
+    transition: transform 0.2s;
+}
+#dark-mode-toggle:checked + span .dot {
+    transform: translateX(16px);
+}
+#dark-mode-toggle:not(:checked) + span .dot {
+    transform: translateX(0);
+}
+body.dark h1,
+body.dark h2,
+body.dark h3,
+body.dark h4,
+body.dark h5,
+body.dark h6,
+body.dark p,
+body.dark .text-gray-700,
+body.dark .text-gray-900,
+body.dark .text-gray-600,
+body.dark .font-medium,
+body.dark .font-bold {
+    color: #e5e7eb !important;
+}
+body.dark .bg-white {
+    background-color: #23232a !important;
+}
+body.dark .bg-gray-50 {
+    background-color: #262632 !important;
+}
+body.dark .border-gray-400 {
+    border-color: #6366f1 !important;
+}
+body.dark select#tag-filter {
+    background-color: #23232a !important;
+    color: #e5e7eb !important;
+    border-color: #6366f1 !important;
+}
+body.dark select#tag-filter option {
+    background-color: #23232a !important;
+    color: #e5e7eb !important;
+}
+body.dark .modal,
+body.dark #delete-modal > div,
+body.dark #tag-delete-modal > div {
+    background-color: #23232a !important;
+    color: #e5e7eb !important;
+}
+body.dark #delete-modal h3,
+body.dark #tag-delete-modal h3,
+body.dark #delete-modal p,
+body.dark #tag-delete-modal p {
+    color: #e5e7eb !important;
+}
+body.dark #delete-modal button,
+body.dark #tag-delete-modal button {
+    background-color: #444459 !important;
+    color: #e5e7eb !important;
+    border-color: #6366f1 !important;
+}
+body.dark #delete-modal button:hover,
+body.dark #tag-delete-modal button:hover {
+    background-color: #6366f1 !important;
+    color: #fff !important;
+}
+body.dark input[type="text"],
+body.dark input[type="date"],
+body.dark textarea {
+    background-color: #23232a !important;
+    color: #e5e7eb !important;
+    border-color: #6366f1 !important;
+}
+body.dark input[type="text"]::placeholder,
+body.dark input[type="date"]::placeholder,
+body.dark textarea::placeholder {
+    color: #a1a1aa !important;
+}
