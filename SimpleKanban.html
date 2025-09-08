@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="src/styles.css">
+    <link rel="icon" type="image/x-icon" href="src/kanban.ico">
 </head>
 <body class="bg-gray-100 text-gray-800" id="main-body">
 
@@ -98,6 +99,14 @@
                 <label for="task-due-date" class="block text-sm font-medium text-gray-700">Due Date</label>
                 <input type="date" id="task-due-date" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
             </div>
+            <div class="mt-4">
+                <label for="stakeholders-input" class="block text-sm font-medium text-gray-700">Key Stakeholders (optional)</label>
+                <input type="text" id="stakeholders-input" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Enter key stakeholders...">
+            </div>
+            <div class="mt-4">
+                <label for="notes-input" class="block text-sm font-medium text-gray-700">Notes (optional)</label>
+                <textarea id="notes-input" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Enter notes..."></textarea>
+            </div>
             <div class="mt-4 flex justify-end space-x-2">
                 <button id="cancel-task" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancel</button>
                 <button id="save-task" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Save Task</button>
@@ -149,9 +158,60 @@
         </div>
     </div>
 
+    <!-- Task Details Modal -->
+    <div id="task-details-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg p-6 w-11/12 max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">Task Details</h3>
+                <button id="close-task-details" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            <div class="space-y-6">
+                <!-- Task Description -->
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-sm font-medium text-gray-700">Task Description</label>
+                        <button class="edit-field-btn text-blue-600 hover:text-blue-800 text-sm" data-field="description">Edit</button>
+                    </div>
+                    <div id="display-description" class="text-gray-900 p-2 border rounded bg-gray-50"></div>
+                    <textarea id="edit-description" class="w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500 hidden" rows="3"></textarea>
+                </div>
+                <!-- Due Date -->
+                <div>
+                    <label for="edit-due-date" class="block text-sm font-medium text-gray-700">Due Date</label>
+                    <input type="date" id="edit-due-date" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <!-- Date Started -->
+                <div>
+                    <label for="edit-started-date" class="block text-sm font-medium text-gray-700">Date Started</label>
+                    <input type="date" id="edit-started-date" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <!-- Stakeholders -->
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-sm font-medium text-gray-700">Key Stakeholders</label>
+                        <button class="edit-field-btn text-blue-600 hover:text-blue-800 text-sm" data-field="stakeholders">Edit</button>
+                    </div>
+                    <div id="display-stakeholders" class="text-gray-900 p-2 border rounded bg-gray-50"></div>
+                    <textarea id="edit-stakeholders" class="w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500 hidden" rows="2"></textarea>
+                </div>
+                <!-- Notes -->
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-sm font-medium text-gray-700">Notes</label>
+                        <button class="edit-field-btn text-blue-600 hover:text-blue-800 text-sm" data-field="notes">Edit</button>
+                    </div>
+                    <div id="display-notes" class="text-gray-900 p-2 border rounded bg-gray-50"></div>
+                    <textarea id="edit-notes" class="w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500 hidden" rows="4"></textarea>
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end space-x-2">
+                <button id="save-task-changes" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
     <script src="src/SimpleKanban.js"></script>
 </body>
 </html>
-
 
 

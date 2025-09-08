@@ -7,7 +7,10 @@ A modern, portable Kanban board web app written in vanilla JS with local data pe
 ## Features
 - **Drag-and-drop Kanban columns**: To Do, In Progress, Completed
 - **Add, edit, and delete tasks**
+- **Task Details Modal**: Double-click tasks to edit description, dates, stakeholders, and notes
+- **Linkified Content**: Automatically detects and links emails and URLs in stakeholders and notes
 - **Due dates, started/completed dates**
+- **Key Stakeholders and Notes**: Store additional task information
 - **Tag tasks with colored labels**
 - **Filter tasks by tag**
 - **Delete tags with confirmation**
@@ -25,8 +28,14 @@ A modern, portable Kanban board web app written in vanilla JS with local data pe
 
 ### Adding Tasks
 - Click the red circle Add Task button.
-- Enter a description and (optionally) a due date.
+- Enter a description, due date, key stakeholders, and notes.
 - Click Save. The task appears in the To Do column.
+
+### Editing Tasks
+- **Double-click any task** to open the Task Details modal.
+- Edit the task description, due date, started/completed dates, stakeholders, and notes.
+- **Linkification**: Emails and URLs in stakeholders/notes are automatically converted to clickable links.
+- Changes are saved automatically when you close the modal or click Save Changes.
 
 ### Drag and Drop
 - Drag tasks between columns to update their status.
@@ -42,7 +51,7 @@ A modern, portable Kanban board web app written in vanilla JS with local data pe
 
 ### Deleting Tasks
 - Move a task to the Completed column.
-- Click the delete button (red circle × or trash icon) to delete the task (with confirmation).
+- Click the delete button (red trash icon) to delete the task (requires confirmation).
 
 ### Deleting Tags
 - In the tag modal, click the × button next to a tag to delete it (with confirmation). This removes the tag from all tasks.
@@ -74,6 +83,8 @@ The board state is stored as a JSON object with the following structure:
       "dueDate": "YYYY-MM-DD",
       "startedDate": "YYYY-MM-DD",
       "completedDate": "YYYY-MM-DD",
+      "stakeholders": "john@example.com, jane@example.com",
+      "notes": "Meeting notes: https://meeting-link.com",
       "tagName": "Tag name",
       "tagColor": "#hexcolor",
       "column": "todo" | "inprogress" | "completed"
@@ -87,7 +98,9 @@ The board state is stored as a JSON object with the following structure:
 }
 ```
 
-- **tasks**: Array of task objects, each with its text, dates, tag info, and column.
+- **tasks**: Array of task objects, each with its text, dates, stakeholders, notes, tag info, and column.
+- **stakeholders**: Comma-separated list of key stakeholders (emails and names).
+- **notes**: Additional task notes and information.
 - **tags**: Object mapping tag names to their colors.
 
 ## Extending for Remote Sync
@@ -112,6 +125,3 @@ The board state is stored as a JSON object with the following structure:
 ## License
 MIT
 
----
-
-Enjoy your portable, modern Kanban board!

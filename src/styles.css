@@ -16,6 +16,9 @@ body.dark .kanban-column {
 .task {
     background-color: #f9fafb;
     color: #222;
+    word-break: break-word;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
 }
 body.dark .task {
     background-color: #262632;

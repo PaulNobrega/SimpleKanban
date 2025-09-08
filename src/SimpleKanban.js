@@ -160,6 +160,12 @@ document.addEventListener('DOMContentLoaded', () => {
             draggedTask = null;
         });
 
+        // Double-click to open details modal
+        task.addEventListener('dblclick', (e) => {
+            e.stopPropagation();
+            openTaskDetailsModal(task);
+        });
+
         const deleteBtn = task.querySelector('.delete-task-btn');
         if (deleteBtn) {
             deleteBtn.addEventListener('click', (e) => {
@@ -275,8 +281,142 @@ document.addEventListener('DOMContentLoaded', () => {
 
     cancelTagBtn.addEventListener('click', closeTagModal);
 
+    // Linkify function for emails and URLs
+    function linkifyText(text) {
+        if (!text) return '';
+        // Linkify emails
+        text = text.replace(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g, '<a href="mailto:$1" class="text-blue-600 hover:underline" target="_blank">$1</a>');
+        // Linkify URLs
+        text = text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" class="text-blue-600 hover:underline" target="_blank">$1</a>');
+        text = text.replace(/(www\.[^\s]+)/g, '<a href="http://$1" class="text-blue-600 hover:underline" target="_blank">$1</a>');
+        return text;
+    }
+
+    // Task Details Modal logic
+    const taskDetailsModal = document.getElementById('task-details-modal');
+    const closeTaskDetailsBtn = document.getElementById('close-task-details');
+    const saveTaskChangesBtn = document.getElementById('save-task-changes');
+    const editFieldBtns = document.querySelectorAll('.edit-field-btn');
+    let currentEditingTask = null;
+
+    function openTaskDetailsModal(task) {
+        currentEditingTask = task;
+        // Populate display fields with linkified data
+        document.getElementById('display-description').innerHTML = linkifyText(task.querySelector('p').textContent);
+        document.getElementById('display-stakeholders').innerHTML = linkifyText(task.dataset.stakeholders || '');
+        document.getElementById('display-notes').innerHTML = linkifyText(task.dataset.notes || '');
+        // Populate edit fields with current values
+        document.getElementById('edit-description').value = task.querySelector('p').textContent;
+        document.getElementById('edit-due-date').value = task.dataset.dueDate || '';
+        document.getElementById('edit-started-date').value = task.dataset.startedDate || '';
+        document.getElementById('edit-stakeholders').value = task.dataset.stakeholders || '';
+        document.getElementById('edit-notes').value = task.dataset.notes || '';
+        // Hide all edit fields initially (except dates which are always visible)
+        document.querySelectorAll('[id^="edit-"]:not(#edit-due-date):not(#edit-started-date)').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('[id^="display-"]').forEach(el => el.classList.remove('hidden'));
+        taskDetailsModal.classList.remove('hidden');
+    }
+
+    function closeTaskDetailsModal() {
+        taskDetailsModal.classList.add('hidden');
+        currentEditingTask = null;
+    }
+
+    function toggleEditMode(field) {
+        const displayEl = document.getElementById(`display-${field}`);
+        const editEl = document.getElementById(`edit-${field}`);
+        if (editEl.classList.contains('hidden')) {
+            // Switch to edit mode
+            editEl.classList.remove('hidden');
+            displayEl.classList.add('hidden');
+            if (field === 'description') {
+                editEl.value = currentEditingTask.querySelector('p').textContent;
+            } else if (field === 'stakeholders') {
+                editEl.value = currentEditingTask.dataset.stakeholders || '';
+            } else if (field === 'notes') {
+                editEl.value = currentEditingTask.dataset.notes || '';
+            }
+            editEl.focus();
+        } else {
+            // Switch back to display mode
+            editEl.classList.add('hidden');
+            displayEl.classList.remove('hidden');
+            // Update display with the edited value
+            if (field === 'description') {
+                displayEl.innerHTML = linkifyText(editEl.value);
+            } else if (field === 'stakeholders') {
+                displayEl.innerHTML = linkifyText(editEl.value);
+            } else if (field === 'notes') {
+                displayEl.innerHTML = linkifyText(editEl.value);
+            }
+        }
+    }
+
+    function saveTaskChanges() {
+        if (!currentEditingTask) return;
+        // Update task data from edit fields
+        const newDescription = document.getElementById('edit-description').value.trim();
+        const newDueDate = document.getElementById('edit-due-date').value;
+        const newStartedDate = document.getElementById('edit-started-date').value;
+        const newStakeholders = document.getElementById('edit-stakeholders').value.trim();
+        const newNotes = document.getElementById('edit-notes').value.trim();
+
+        // Update task element
+        currentEditingTask.querySelector('p').innerHTML = linkifyText(newDescription);
+        currentEditingTask.dataset.dueDate = newDueDate;
+        currentEditingTask.dataset.startedDate = newStartedDate;
+        currentEditingTask.dataset.stakeholders = newStakeholders;
+        currentEditingTask.dataset.notes = newNotes;
+
+        // Update display spans on task card
+        const dueDateSpan = currentEditingTask.querySelector('.due-date-display');
+        if (dueDateSpan) {
+            if (newDueDate) {
+                const date = new Date(newDueDate);
+                dueDateSpan.textContent = `Due: ${date.toLocaleDateString(undefined, { timeZone: 'UTC' })}`;
+                dueDateSpan.classList.remove('hidden');
+            } else {
+                dueDateSpan.classList.add('hidden');
+            }
+        }
+
+        const startedDateSpan = currentEditingTask.querySelector('.started-date-display');
+        if (startedDateSpan) {
+            if (newStartedDate) {
+                const date = new Date(newStartedDate);
+                startedDateSpan.textContent = `Started: ${date.toLocaleDateString(undefined, { timeZone: 'UTC' })}`;
+                startedDateSpan.classList.remove('hidden');
+            } else {
+                startedDateSpan.classList.add('hidden');
+            }
+        }
+
+        saveBoardState();
+        closeTaskDetailsModal();
+    }
+
+    if (closeTaskDetailsBtn) {
+        closeTaskDetailsBtn.addEventListener('click', closeTaskDetailsModal);
+    }
+    if (saveTaskChangesBtn) {
+        saveTaskChangesBtn.addEventListener('click', saveTaskChanges);
+    }
+    editFieldBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const field = e.target.dataset.field;
+            toggleEditMode(field);
+        });
+    });
+
+    // Close modal on Escape key
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !taskDetailsModal.classList.contains('hidden')) {
+            closeTaskDetailsModal();
+        }
+    });
+
     // Function to create a new task element
-    function createNewTask(text, dueDate) {
+    function createNewTask(text, dueDate, stakeholders, notes) {
         const task = document.createElement('div');
         task.className = 'task p-4 bg-gray-50 rounded-lg shadow cursor-grab active:cursor-grabbing relative';
         task.draggable = true;
@@ -296,6 +436,9 @@ document.addEventListener('DOMContentLoaded', () => {
             dueDateSpan.textContent = 'Due: --';
         }
         task.appendChild(dueDateSpan);
+        // Store stakeholders and notes in dataset
+        if (stakeholders) task.dataset.stakeholders = stakeholders;
+        if (notes) task.dataset.notes = notes;
         // Started Date
         const startedDateSpan = document.createElement('span');
         startedDateSpan.className = 'started-date-display text-xs text-gray-500 mt-1 block hidden';
@@ -420,6 +563,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveTaskButton = document.getElementById('save-task');
     const taskInput = document.getElementById('task-input');
     const dueDateInput = document.getElementById('task-due-date');
+    const stakeholdersInput = document.getElementById('stakeholders-input');
+    const notesInput = document.getElementById('notes-input');
     const deleteModal = document.getElementById('delete-modal');
     const cancelDeleteBtn = document.getElementById('cancel-delete');
     const confirmDeleteBtn = document.getElementById('confirm-delete');
@@ -434,14 +579,18 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.classList.add('hidden');
         taskInput.value = '';
         dueDateInput.value = '';
+        if (stakeholdersInput) stakeholdersInput.value = '';
+        if (notesInput) notesInput.value = '';
         targetColumn = null;
     }
     cancelTaskButton.addEventListener('click', closeModal);
     saveTaskButton.addEventListener('click', () => {
         const taskText = taskInput.value.trim();
         const dueDate = dueDateInput.value;
+        const stakeholders = stakeholdersInput ? stakeholdersInput.value.trim() : '';
+        const notes = notesInput ? notesInput.value.trim() : '';
         if (taskText && targetColumn) {
-            const newTask = createNewTask(taskText, dueDate);
+            const newTask = createNewTask(taskText, dueDate, stakeholders, notes);
             targetColumn.appendChild(newTask);
             saveBoardState(); // Persist new task
             closeModal();
@@ -585,6 +734,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     completedDate: task.dataset.completedDate || '',
                     tagName: task.dataset.tagName || '',
                     tagColor: task.dataset.tagColor || '',
+                    stakeholders: task.dataset.stakeholders || '',
+                    notes: task.dataset.notes || '',
                     column: columnId
                 });
             });
@@ -631,7 +782,7 @@ document.addEventListener('DOMContentLoaded', () => {
         Object.assign(tags, boardData.tags);
         // Restore tasks
         boardData.tasks.forEach(taskData => {
-            const task = createNewTask(taskData.text, taskData.dueDate);
+            const task = createNewTask(taskData.text, taskData.dueDate, taskData.stakeholders, taskData.notes);
             if (taskData.startedDate) task.dataset.startedDate = taskData.startedDate;
             if (taskData.completedDate) task.dataset.completedDate = taskData.completedDate;
             if (taskData.tagName) {
@@ -706,57 +857,19 @@ document.addEventListener('DOMContentLoaded', () => {
         originalOpenTagModal.apply(this, args);
         saveBoardState();
     };
-    // Save after deleting a task
-    confirmDeleteBtn.addEventListener('click', () => {
-        if (taskToDelete) {
-            taskToDelete.remove();
-            saveBoardState(); // Ensure localStorage is updated after deletion
-        }
-        deleteModal.classList.add('hidden');
-        taskToDelete = null;
-    });
-    // Save after deleting a tag
-    function showTagDeleteModal(tagName) {
-        tagToDelete = tagName;
-        ensureTagDeleteModal();
-        tagDeleteNameSpan.textContent = tagName;
-        tagDeleteModal.classList.remove('hidden');
-        tagDeleteCancelBtn.onclick = hideTagDeleteModal;
-        tagDeleteConfirmBtn.onclick = function() {
-            if (tagToDelete) {
-                // Remove tag from global tags
-                delete tags[tagToDelete];
-                // Remove tag from all tasks
-                document.querySelectorAll('.task').forEach(task => {
-                    if (task.dataset.tagName === tagToDelete) {
-                        delete task.dataset.tagName;
-                        delete task.dataset.tagColor;
-                        const tagCircle = task.querySelector('.tag-circle');
-                        if (tagCircle) {
-                            tagCircle.style.backgroundColor = 'transparent';
-                            tagCircle.classList.add('border-2', 'border-gray-400');
-                        }
-                        const tooltipOverlay = task.querySelector('.task-tooltip-overlay');
-                        if (tooltipOverlay) {
-                            tooltipOverlay.textContent = '';
-                        }
-                    }
-                });
-                openTagModal();
-                hideTagDeleteModal();
-                saveBoardState();
-            }
-        };
-    }
+
     // Dark mode toggle logic
     function setupDarkModeToggle() {
         const darkToggle = document.getElementById('dark-mode-toggle');
         const dot = document.querySelector('.dot');
         const mainBody = document.getElementById('main-body');
 
-        // Set initial state from localStorage or system preference
+        // Check for saved preference or system preference
         const savedMode = localStorage.getItem('darkMode');
-        if (savedMode === 'true') {
+        const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        // Set initial state
+        if (savedMode === 'true' || (!savedMode && systemPrefersDark)) {
             darkToggle.checked = true;
             mainBody.classList.add('dark');
             if (dot) dot.style.transform = 'translateX(16px)';
@@ -765,6 +878,8 @@ document.addEventListener('DOMContentLoaded', () => {
             mainBody.classList.remove('dark');
             if (dot) dot.style.transform = 'translateX(0)';
         }
+
+        // Handle toggle changes
         darkToggle.addEventListener('change', function() {
             if (darkToggle.checked) {
                 mainBody.classList.add('dark');
@@ -776,6 +891,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (dot) dot.style.transform = 'translateX(0)';
             }
         });
+
+        // Listen for system preference changes
+        if (window.matchMedia) {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+                // Only auto-switch if user hasn't manually set a preference
+                if (!localStorage.getItem('darkMode')) {
+                    if (e.matches) {
+                        darkToggle.checked = true;
+                        mainBody.classList.add('dark');
+                        if (dot) dot.style.transform = 'translateX(16px)';
+                    } else {
+                        darkToggle.checked = false;
+                        mainBody.classList.remove('dark');
+                        if (dot) dot.style.transform = 'translateX(0)';
+                    }
+                }
+            });
+        }
     }
+
+    // Initialize dark mode
     setupDarkModeToggle();
 });
